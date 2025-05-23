@@ -577,6 +577,120 @@ xl: 1280px   // Extra large devices
               </div>
             </div>
           </section>
+
+          <section>
+            <h3 className="text-2xl font-bold mb-4">SQL Lekérdezések és API Műveletek</h3>
+            
+            <div className="space-y-6">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-xl font-semibold mb-4">1. Komplex SQL Lekérdezések</h4>
+                <p className="text-gray-700 mb-4">
+                  A következő példa bemutatja, hogyan lehet összetett SQL lekérdezéseket írni több tábla összekapcsolásával.
+                  A példában egy rendelés adatait kérjük le, amely tartalmazza a termék és kategória információkat is.
+                </p>
+                <pre className="bg-gray-100 p-4 rounded mb-4">
+                  {`// Egy adott rendelés lekérdezése
+app.get('/rendeles/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.get(\`
+    SELECT 
+      r.ra, r.rd, r.db,
+      t.ta, t.tn AS valami, t.fe, t.te, t.fo, t.et, t.ar,
+      k.kat AS kat_id k.kn AS kn_nev
+    FROM rend r
+    JOIN term t ON r.ta = t.ta
+    JOIN kat k ON t.ka = k.ka
+    WHERE r.ra = ?
+  \`, [id], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: 'Adatbázis hiba a rendelés lekérdezésekor' });
+      return;
+    }
+    
+    if (!row) {
+      res.status(404).json({ error: 'A rendelés nem található' });
+      return;
+    }
+    
+    res.json(row);
+  });
+});`}
+                </pre>
+                <p className="text-gray-700">
+                  A lekérdezés három táblát kapcsol össze (rendelesek, termekek, kategoriak) és részletes információkat ad vissza
+                  egy adott rendelésről. A JOIN műveletek segítségével összekapcsoljuk a kapcsolódó adatokat.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-xl font-semibold mb-4">2. PATCH Művelet Implementálása</h4>
+                <p className="text-gray-700 mb-4">
+                  A PATCH művelet lehetővé teszi egy erőforrás részleges frissítését. A következő példa bemutatja,
+                  hogyan lehet dinamikusan összeállítani egy UPDATE lekérdezést a megadott mezők alapján.
+                </p>
+                <pre className="bg-gray-100 p-4 rounded mb-4">
+                  {`app.patch('/rendeles/:id', (req, res) => {
+  const { rendeles_azonosito } = req.params;
+  const { termek_azonosito, rendeles_datum, db } = req.body;
+
+  // Legalább egy módosítandó mező legyen megadva
+  if (!termek_azonosito && !rendeles_datum && !db) {
+    res.status(400).json({ error: 'Legalább egy mezőt meg kell adni a módosításhoz' });
+    return;
+  }
+
+  // Dinamikus SQL összeállítása
+  const updates = [];
+  const params = [];
+  
+  if (termek_azonosito) {
+    updates.push('termek_azonosito = ?');
+    params.push(termek_azonosito);
+  }
+  if (rendeles_datum) {
+    updates.push('rendeles_datum = ?');
+    params.push(rendeles_datum);
+  }
+  if (db) {
+    updates.push('db = ?');
+    params.push(db);
+  }
+  
+  params.push(rendeles_azonosito);
+
+  const query = \`UPDATE rendelesek SET \${updates.join(', ')} WHERE rendeles_azonosito = ?\`;
+
+  db.run(query, params, function(err) {
+    if (err) {
+      res.status(500).json({ error: 'Adatbázis hiba a rendelés módosításakor' });
+      return;
+    }
+    
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'A rendelés nem található' });
+      return;
+    }
+    
+    res.json({
+      message: 'Rendelés sikeresen frissítve',
+      changes: this.changes
+    });
+  });
+});`}
+                </pre>
+                <p className="text-gray-700">
+                  A kód bemutatja a következő fontos koncepciókat:
+                </p>
+                <ul className="list-disc pl-6 mt-2">
+                  <li>Dinamikus SQL lekérdezés összeállítása a megadott mezők alapján</li>
+                  <li>Paraméterek biztonságos kezelése prepared statements segítségével</li>
+                  <li>Hibakezelés és megfelelő HTTP státuszkódok visszaadása</li>
+                  <li>Válasz objektum strukturálása</li>
+                </ul>
+              </div>
+            </div>
+          </section>
         </div>
       )}
 
