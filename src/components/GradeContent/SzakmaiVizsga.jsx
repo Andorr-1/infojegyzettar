@@ -281,6 +281,316 @@ const UjJarat = () => {
               </pre>
             </div>
           </section>
+
+          <section>
+            <h3 className="text-2xl font-bold mb-4">Frontend Fejlesztés React-tel</h3>
+            
+            <div className="space-y-6">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-xl font-semibold mb-4">1. Környezeti változók használata</h4>
+                <p className="text-gray-700 mb-4">
+                  A backend API URL-jének környezeti változóban való tárolása biztonságos és karbantartható megoldás.
+                </p>
+                <pre className="bg-gray-100 p-4 rounded mb-4">
+                  {`// .env fájl létrehozása a projekt gyökérkönyvtárában
+VITE_API_URL=http://localhost:8000
+
+// API hívások a komponensekben
+const API_URL = import.meta.env.VITE_API_URL;
+
+// Példa API hívás
+const fetchStudents = async () => {
+  try {
+    const response = await fetch(\`\${API_URL}/tanulok\`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Hiba a tanulók lekérdezésekor:', error);
+    throw error;
+  }
+};`}
+                </pre>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-xl font-semibold mb-4">2. Komponensek létrehozása</h4>
+                <p className="text-gray-700 mb-4">
+                  A React komponensek moduláris építőelemek, amelyek újrafelhasználhatók és könnyen karbantarthatók.
+                </p>
+                <pre className="bg-gray-100 p-4 rounded mb-4">
+                  {`// Tanulok.jsx
+import React from 'react';
+import Student from '../assets/student.svg';
+
+const Tanulok = () => {
+  return (
+    <div>
+      <h2>Tanulók</h2>
+      <img src={Student} alt="Student" />
+    </div>
+  );
+};
+
+export default Tanulok;
+
+import React from 'react';
+
+const TanuloForm = () => {
+  return (
+    <div>
+      <h2>Új tanuló felvitele</h2>
+    </div>
+  );
+};
+
+export default TanuloForm;
+
+// Menu.jsx
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Books from '../assets/books.png';
+
+const Menu = () => {
+  return (
+    <nav className="bg-primary p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <img src={Books} alt="Books" className="h-8" />
+        <div className="space-x-4">
+          <Link to="/tanulok" className="text-white hover:text-gray-200">
+            Tanulók
+          </Link>
+          <Link to="/tanuloform" className="text-white hover:text-gray-200">
+            Új tanuló
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Menu;`}
+                </pre>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-xl font-semibold mb-4">3. Routing és Navigáció</h4>
+                <p className="text-gray-700 mb-4">
+                  A React Router segítségével oldalankénti navigációt valósíthatunk meg.
+                </p>
+                <pre className="bg-gray-100 p-4 rounded mb-4">
+                  {`// App.jsx
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Menu from './components/Menu';
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Menu />
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/" element={< />} />
+        <Route path="/" element={< />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;`}
+                </pre>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-xl font-semibold mb-4">4. Adatok kezelése és megjelenítése</h4>
+                <p className="text-gray-700 mb-4">
+                  A komponensekben az adatokat state-ben tároljuk és API hívásokkal kezeljük.
+                </p>
+                <pre className="bg-gray-100 p-4 rounded mb-4">
+                  {`// Tanulok.jsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Tanulok = () => {
+  const [students, setStudents] = useState([]);
+  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch(\`\${API_URL}/tanulok\`);
+      const data = await response.json();
+      setStudents(data);
+    } catch (error) {
+      console.error('Hiba a tanulók lekérdezésekor:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await fetch(\`\${API_URL}/tanulo/id/\${id}\`, {
+        method: 'DELETE'
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Hiba a törlés során:', error);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {students.map(student => (
+          <TanuloCard
+            key={student.oktazon}
+            student={student}
+            onDelete={handleDelete}
+            image={Studying}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Tanulok;
+
+const TanuloCard = ({ student, onDelete, image }) => {
+  return (
+    <div className="bg-white p-4 rounded-lg shadow">
+      <img src={image} alt="Studying" className="w-full h-48 object-cover rounded" />
+      <h3>{student.nev}</h3>
+      <p>Oktatási azonosító: {student.oktazon}</p>
+      <p>Hozott: {student.hozott}</p>
+      <p>Központi: {student.kpmagy + student.kpmat}</p>
+      <button
+        onClick={() => onDelete(student.oktazon)}
+        className="bg-red-500 text-white px-4 py-2 rounded"
+      >
+        Törlés
+      </button>
+    </div>
+  );
+};`}
+                </pre>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-xl font-semibold mb-4">5. Űrlap kezelése</h4>
+                <p className="text-gray-700 mb-4">
+                  Az űrlapok kezeléséhez state-et használunk és a form submit eseményt kezeljük.
+                </p>
+                <pre className="bg-gray-100 p-4 rounded mb-4">
+                  {`// TanuloForm.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const TanuloForm = () => {
+  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
+  const [formData, setFormData] = useState({
+    adat: '',
+    adat: '',
+    adat: '',
+    adat: '',
+    adat: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await fetch(\`\${API_URL}/tanulo\`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Hiba a tanuló felvitele során:', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4">
+      <div className="mb-4">
+        <label className="block mb-2">Oktatási azonosító:</label>
+        <input
+          type="text"
+          name="oktazon"
+          value={formData.oktazon}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2">Név:</label>
+        <input
+          type="text"
+          name="nev"
+          value={formData.nev}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2">Hozott pontszám:</label>
+        <input
+          type="number"
+          name="hozott"
+          value={formData.hozott}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2">Központi magyar:</label>
+        <input
+          type="number"
+          name="kpmagy"
+          value={formData.kpmagy}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2">Központi matek:</label>
+        <input
+          type="number"
+          name="kpmat"
+          value={formData.kpmat}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <button type="submit" className="bg-primary text-white px-4 py-2 rounded">
+        Mentés
+      </button>
+    </form>
+  );
+};
+
+export default TanuloForm;`}
+                </pre>
+              </div>
+            </div>
+          </section>
         </div>
       )}
 
