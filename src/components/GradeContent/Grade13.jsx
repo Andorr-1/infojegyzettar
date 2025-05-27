@@ -522,7 +522,41 @@ active:scale-95       // Kattintás effekt
 // Animációk
 transition-all        // Minden tulajdonság animálása
 duration-300          // 300ms animáció idő
-ease-in-out          // Animáció időzítés`}
+ease-in-out          // Animáció időzítés
+grid: CSS Grid elrendezés
+
+grid-cols-1: 1 oszlop mobil méret alatt
+
+sm:grid-cols-2: 2 oszlop kis képernyőn (640px+)
+
+md:grid-cols-3: 3 oszlop közepes képernyőn (768px+)
+
+lg:grid-cols-4: 4 oszlop nagy képernyőn (1024px+)
+
+gap-4: 1rem (16px) térköz az elemek között
+
+p-4: 1rem (16px) padding a konténeren belül
+
+flex: Flexbox elrendezés
+
+flex-wrap: Többsoros flex elemek
+
+justify-center: Középre igazítás
+
+w-full: Teljes szélesség
+
+sm:w-1/2: 50% szélesség kis képernyőn
+
+md:w-1/3: 33% szélesség közepes képernyőn
+
+lg:w-1/4: 25% szélesség nagy képernyőn
+
+pl: className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4",
+className="flex flex-wrap justify-center gap-4 p-4
+-className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
+// `}
+
+
                 </pre>
               </div>
 
