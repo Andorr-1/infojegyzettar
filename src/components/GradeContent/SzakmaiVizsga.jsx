@@ -287,7 +287,7 @@ const UjJarat = () => {
             
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg shadow">
-                <h4 className="text-xl font-semibold mb-4">1. Környezeti változók használata</h4>
+                <h4 className="text-xl font-semibold mb-4">1. Környezeti változók használata1</h4>
                 <p className="text-gray-700 mb-4">
                   A backend API URL-jének környezeti változóban való tárolása biztonságos és karbantartható megoldás.
                 </p>
@@ -313,7 +313,7 @@ const fetchStudents = async () => {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h4 className="text-xl font-semibold mb-4">2. Komponensek létrehozása</h4>
+                <h4 className="text-xl font-semibold mb-4">2. Komponensek létrehozása3-4-5</h4>
                 <p className="text-gray-700 mb-4">
                   A React komponensek moduláris építőelemek, amelyek újrafelhasználhatók és könnyen karbantarthatók.
                 </p>
@@ -373,7 +373,7 @@ export default Menu;`}
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h4 className="text-xl font-semibold mb-4">3. Routing és Navigáció</h4>
+                <h4 className="text-xl font-semibold mb-4">3. Routing és Navigáció5</h4>
                 <p className="text-gray-700 mb-4">
                   A React Router segítségével oldalankénti navigációt valósíthatunk meg.
                 </p>
@@ -401,7 +401,7 @@ export default App;`}
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h4 className="text-xl font-semibold mb-4">4. Adatok kezelése és megjelenítése</h4>
+                <h4 className="text-xl font-semibold mb-4">4. Adatok kezelése és megjelenítése6</h4>
                 <p className="text-gray-700 mb-4">
                   A komponensekben az adatokat state-ben tároljuk és API hívásokkal kezeljük.
                 </p>
@@ -479,7 +479,7 @@ const TanuloCard = ({ student, onDelete, image }) => {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h4 className="text-xl font-semibold mb-4">5. Űrlap kezelése</h4>
+                <h4 className="text-xl font-semibold mb-4">5. Űrlap kezelése8</h4>
                 <p className="text-gray-700 mb-4">
                   Az űrlapok kezeléséhez state-et használunk és a form submit eseményt kezeljük.
                 </p>
