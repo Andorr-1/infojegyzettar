@@ -590,32 +590,25 @@ xl: 1280px   // Extra large devices
                 </p>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
                   {`// Egy adott rendelés lekérdezése
-app.get('/rendeles/:id', (req, res) => {
-  const { id } = req.params;
-
-  db.get(\`
-    SELECT 
-      r.ra, r.rd, r.db,
-      t.ta, t.tn AS valami, t.fe, t.te, t.fo, t.et, t.ar,
-      k.kat AS kat_id k.kn AS kn_nev
-    FROM rend r
-    JOIN term t ON r.ta = t.ta
-    JOIN kat k ON t.ka = k.ka
-    WHERE r.ra = ?
-  \`, [id], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: 'Adatbázis hiba a rendelés lekérdezésekor' });
-      return;
-    }
-    
-    if (!row) {
-      res.status(404).json({ error: 'A rendelés nem található' });
-      return;
-    }
-    
-    res.json(row);
-  });
-});`}
+app.get("/rendeles/:rendeles_azonosito", (req,res) =>{
+    const rendeles_azonosito = req.params.razon
+    db.all(
+        SELECT rendelesek.rendeles_azonosito, rendelesek.rdatum, rendelesek.termek_azonosito, rendelesek.db, 
+                termekek.tnev as termek_nev, kategoriak.knev as kategoria_nev 
+         FROM rendelesek, termekek, kategoriak 
+         WHERE rendelesek.termek_azonosito = termekek.termek_azonosito 
+         AND termekek.kazon = kategoriak.kazon 
+         AND rendelesek.rendeles_azonosito = ?,
+        [rendeles_azonosito],
+        (error, rows) =>{
+            if (error){
+                res.json({error})
+            }else{
+                res.json({rows})
+            }
+        }
+    )
+})`}
                 </pre>
                 <p className="text-gray-700">
                   A lekérdezés három táblát kapcsol össze (rendelesek, termekek, kategoriak) és részletes információkat ad vissza
@@ -630,54 +623,38 @@ app.get('/rendeles/:id', (req, res) => {
                   hogyan lehet dinamikusan összeállítani egy UPDATE lekérdezést a megadott mezők alapján.
                 </p>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
-                  {`app.patch('/rendeles/:id', (req, res) => {
-  const { rendeles_azonosito } = req.params;
-  const { termek_azonosito, rendeles_datum, db } = req.body;
-
-  // Legalább egy módosítandó mező legyen megadva
-  if (!termek_azonosito && !rendeles_datum && !db) {
-    res.status(400).json({ error: 'Legalább egy mezőt meg kell adni a módosításhoz' });
-    return;
-  }
-
-  // Dinamikus SQL összeállítása
-  const updates = [];
-  const params = [];
-  
-  if (termek_azonosito) {
-    updates.push('termek_azonosito = ?');
-    params.push(termek_azonosito);
-  }
-  if (rendeles_datum) {
-    updates.push('rendeles_datum = ?');
-    params.push(rendeles_datum);
-  }
-  if (db) {
-    updates.push('db = ?');
-    params.push(db);
-  }
-  
-  params.push(rendeles_azonosito);
-
-  const query = \`UPDATE rendelesek SET \${updates.join(', ')} WHERE rendeles_azonosito = ?\`;
-
-  db.run(query, params, function(err) {
-    if (err) {
-      res.status(500).json({ error: 'Adatbázis hiba a rendelés módosításakor' });
-      return;
-    }
+                  {`
+});
+app.patch("/rendeles/:rendeles_azonosito", (req,res) =>{
+    const rendeles_azonosito = req.params.razon
+    const {rdatum, termek_azonosito, db} = req.body
+    const sql = 'UPDATE rendelesek SET rdatum = ?, termek_azonosito = ?, db = ? WHERE rendeles_azonosito = ?'
     
-    if (this.changes === 0) {
-      res.status(404).json({ error: 'A rendelés nem található' });
-      return;
-    }
-    
-    res.json({
-      message: 'Rendelés sikeresen frissítve',
-      changes: this.changes
-    });
-  });
-});`}
+    db.run(sql, [rdatum, termek_azonosito, db, rendeles_azonosito], (error) =>{
+        if (error){
+            res.json({error})
+            console.log(error)
+        }else{
+            res.json({message: "Rendelés adatai módosítva!"})
+        }
+    })
+})
+
+app.post("/kategoriak", (req,res) =>{
+    const {kazon, knev} = req.body
+    const sql = (INSERT INTO kategoriak (kazon, knev) VALUES (?, ?))
+
+    db.run(sql, [kazon, knev], (error) =>{
+        if (error){
+            res.json({error})
+            console.log(error)
+        }else{
+            res.json({message: "Új kategória hozzáadva!"})
+        }
+    })
+})
+`
+}
                 </pre>
                 <p className="text-gray-700">
                   A kód bemutatja a következő fontos koncepciókat:
@@ -937,46 +914,50 @@ app.listen(port, () => {
                 </p>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
                   {`// Dron.cs - Adatmodell
-public class Dron
-{
-    public string DroneNeve { get; set; }
-    public string Tipus { get; set; }
-    public int GyartasiEv { get; set; }
-    public int MaxSebesseg { get; set; }
-    public int AkkumulatorKapacitas { get; set; }
-    public int RepulesiIdo { get; set; }
+    public class Dronok
+    {
+        // Drón neve,Típus,Gyártási év,Maximális sebesség (km/h),Akkumulátor kapacitás (mAh),Repülési idő (perc)
+        public string Dron_nev { get; set; }
+        public string Tipus { get; set; }
+        public int GyartasiEv { get; set; }
+        public int Maxsebesseg { get; set; }
+        public int AkkumulatorK { get; set; }
+        public int RepulesiIdo { get; set; }
+
+        public Dronok(string sor, char hatarolo)
+        {
+            var adatok = sor.Split(hatarolo);
+            Dron_nev = adatok[0];
+            Tipus = adatok[1];
+            GyartasiEv = Convert.ToInt32(adatok[2]);
+            Maxsebesseg = Convert.ToInt32(adatok[3]);
+            AkkumulatorK = Convert.ToInt32(adatok[4]);
+            RepulesiIdo = Convert.ToInt32(adatok[5]);
+        }
+    }
 }
 
 // MainWindow.xaml - Felhasználói felület
-<Grid>
-    <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-    </Grid.RowDefinitions>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-    <Menu Grid.Row="0">
-        <MenuItem Header="Fájl">
-            <MenuItem Header="Betöltés" Click="Betoltes_Click"/>
-        </MenuItem>
-    </Menu>
+        <StackPanel Grid.Column="0" Grid.Row="0" Margin="10">
+            <TextBlock Text="Drónok" HorizontalAlignment="Center" FontWeight="Bold" FontSize="20"/>
+            <ComboBox x:Name="comboTipusSzuro" Width="100" SelectionChanged="comboTipusSzuro_SelectionChanged"/>
+        </StackPanel>
 
-    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
-        <TextBlock Text="Szűrés típus szerint:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-        <ComboBox x:Name="tipusComboBox" Width="200" SelectionChanged="TipusComboBox_SelectionChanged"/>
-    </StackPanel>
-
-    <DataGrid x:Name="dronokDataGrid" Grid.Row="2" Margin="5" AutoGenerateColumns="False">
-        <DataGrid.Columns>
-            <DataGridTextColumn Header="Drón neve" Binding="{Binding DroneNeve}"/>
-            <DataGridTextColumn Header="Típus" Binding="{Binding Tipus}"/>
-            <DataGridTextColumn Header="Gyártási év" Binding="{Binding GyartasiEv}"/>
-            <DataGridTextColumn Header="Max. sebesség (km/h)" Binding="{Binding MaxSebesseg}"/>
-            <DataGridTextColumn Header="Akkumulátor (mAh)" Binding="{Binding AkkumulatorKapacitas}"/>
-            <DataGridTextColumn Header="Repülési idő (perc)" Binding="{Binding RepulesiIdo}"/>
-        </DataGrid.Columns>
-    </DataGrid>
-</Grid>`}
+        <Button x:Name="buttonmegnyitas" Height="50" Width="100" Content="Megnyitás" Grid.Column="0" Grid.Row="1" Margin="10" Click="buttonmegnyitas_Click"/>
+        <DataGrid x:Name="datagridDronok" Grid.Column="1" Grid.ColumnSpan="2" Grid.RowSpan="2" ColumnWidth="*" Margin="10"/>
+    </Grid>
+`}
                 </pre>
                 <p className="text-gray-700 mb-4">
                   A kód egy drón kezelő alkalmazást mutat be. A Dron osztály az adatmodellt definiálja, 
@@ -989,76 +970,55 @@ public class Dron
                 <h4 className="text-xl font-semibold mb-4">2. Adatkezelés és eseménykezelés</h4>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
                   {`// MainWindow.xaml.cs - Adatkezelés és eseménykezelés
-public partial class MainWindow : Window
-{
-    private List<Dron> dronok = new List<Dron>();
-
-    public MainWindow()
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
-    }
+        List<Dronok> dronok = new List<Dronok>();
 
-    private void Betoltes_Click(object sender, RoutedEventArgs e)
-    {
-        OpenFileDialog openFileDialog = new OpenFileDialog
+        public MainWindow()
         {
-            Filter = "CSV fájlok (*.csv)|*.csv",
-            Title = "Drónok adatfájl kiválasztása"
-        };
+            InitializeComponent();
+        }
 
-        if (openFileDialog.ShowDialog() == true)
+        private void buttonmegnyitas_Click(object sender, RoutedEventArgs e)
         {
-            try
+            OpenFileDialog fileDialog = new OpenFileDialog();
+
+            if (fileDialog.ShowDialog() == true)
             {
+                var sorok = File.ReadAllLines(fileDialog.FileName);
                 dronok.Clear();
-                var sorok = File.ReadAllLines(openFileDialog.FileName);
 
-                foreach (var sor in sorok.Skip(1))
+                for (int i = 1; i < sorok.Length; i++)
                 {
-                    if (string.IsNullOrWhiteSpace(sor))
-                        continue;
-
-                    var adatok = sor.Split('\t');
-                    if (adatok.Length >= 6)
-                    {
-                        dronok.Add(new Dron
-                        {
-                            DroneNeve = adatok[0],
-                            Tipus = adatok[1],
-                            GyartasiEv = int.Parse(adatok[2]),
-                            MaxSebesseg = int.Parse(adatok[3]),
-                            AkkumulatorKapacitas = int.Parse(adatok[4]),
-                            RepulesiIdo = int.Parse(adatok[5])
-                        });
-                    }
+                    dronok.Add(new Dronok(sorok[i], ','));
                 }
 
-                dronokDataGrid.ItemsSource = dronok;
-                MessageBox.Show($"Sikeres betöltés: {dronok.Count} drón adata.");
+                datagridDronok.ItemsSource = dronok;
+
+                // Típusok ComboBox feltöltése
+                var tipusok = dronok.Select(d => d.Tipus).Distinct().OrderBy(t => t).ToList();
+                tipusok.Insert(0, "Összes");
+                comboTipusSzuro.ItemsSource = tipusok;
+                comboTipusSzuro.SelectedIndex = 0;
             }
-            catch (Exception ex)
+        }
+
+        private void comboTipusSzuro_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string kivalasztott = comboTipusSzuro.SelectedItem as string;
+
+            if (kivalasztott == "Összes")
             {
-                MessageBox.Show($"Hiba történt: {ex.Message}", "Hiba", 
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                datagridDronok.ItemsSource = dronok;
+            }
+            else
+            {
+                datagridDronok.ItemsSource = dronok.Where(d => d.Tipus == kivalasztott).ToList();
             }
         }
     }
-
-    private void TipusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (tipusComboBox.SelectedItem == null || !dronok.Any()) return;
-
-        var kivalasztott = tipusComboBox.SelectedItem.ToString();
-        if (kivalasztott == "Összes")
-        {
-            dronokDataGrid.ItemsSource = dronok;
-        }
-        else
-        {
-            dronokDataGrid.ItemsSource = dronok.Where(d => d.Tipus == kivalasztott);
-        }
-    }
-}`}
+}
+`}
                 </pre>
                 <p className="text-gray-700 mb-4">
                   A kód bemutatja a fájl betöltését és az adatok kezelését. A Betoltes_Click eseménykezelő 
@@ -1178,43 +1138,39 @@ public class RepulogepHordozo : Hajo
 
 // Tengeralattjaro.cs - Tengeralattjáró osztály
 public class Tengeralattjaro : Hajo
-{
-    // Egyedi tulajdonságok
-    public int MerulesiMelyseg { get; set; }
-    public int TorpedokSzama { get; set; }
-
-    // Konstruktor
-    public Tengeralattjaro(string nev, int hossz, int vizKiszoritas, 
-                          double maxSebesseg, string orszag, 
-                          int merulesiMelyseg, int torpedokSzama) 
-        : base(nev, hossz, vizKiszoritas, maxSebesseg, orszag)
     {
-        MerulesiMelyseg = merulesiMelyseg;
-        TorpedokSzama = torpedokSzama;
-    }
+        public int MerulesiMelyseg { get; set; }
+        public int TorpedokSzama { get; set; }
+        public Tengeralattjaro(string nev, int hossz, int vizKiszoritas, int maxSebesseg, string orszag, int merulesiMelyseg, int torpedokSzama) : base(nev, hossz, vizKiszoritas, maxSebesseg, orszag)
+        {
+            MerulesiMelyseg = merulesiMelyseg;
+            TorpedokSzama = torpedokSzama;
+        }
 
-    // Absztrakt metódusok implementálása
-    public override void Tamad()
-    {
-        Console.WriteLine("A tengeralattjáró torpedókkal támad");
-    }
+        public override void Tamad()
+        {
+            Console.WriteLine("A tengeralattjaró torpedókkal támad");
+        }
 
-    public override void Vedekezik()
-    {
-        Console.WriteLine("A tengeralattjáró elrejtőzik a mélységbe");
-    }
+        public override void Vedekezik()
+        {
+            Console.WriteLine("A tengeralattjáró elrejtőzik a mélységbe");
+        }
 
-    // Egyedi metódusok
-    public void Merules()
-    {
-        Console.WriteLine("A tengeralattjáró merül");
-    }
+        public void Merules()
+        {
+            Console.WriteLine("A tengeralattjaró merül");
+        }
+        public void Felszin()
+        {
+            Console.WriteLine("A tengeralattjaró a felszínre jön");
+        }
 
-    public void Felszin()
-    {
-        Console.WriteLine("A tengeralattjáró a felszínre jön");
+        public override string ToString()
+        {
+            return base.ToString() + $", Merülési mélység: {MerulesiMelyseg}m, Torpedók száma: {TorpedokSzama}";
+        }
     }
-}
 
 // Program.cs - Példa használat
 class Program
@@ -1271,77 +1227,57 @@ class Program
                   A következő példa bemutatja, hogyan lehet adatokat betölteni és kezelni egy WPF alkalmazásban.
                 </p>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
-                  {`// MainWindow.xaml.cs
-public partial class MainWindow : Window
-{
-    private List<Dron> dronok = new List<Dron>();
-
-    public MainWindow()
+                  {`
+// MainWindow.xaml.cs
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
-    }
+        List<Dronok> dronok = new List<Dronok>();
 
-    private void Betoltes_Click(object sender, RoutedEventArgs e)
-    {
-        OpenFileDialog openFileDialog = new OpenFileDialog
+        public MainWindow()
         {
-            Filter = "CSV fájlok (*.csv)|*.csv",
-            Title = "Drónok adatfájl kiválasztása"
-        };
+            InitializeComponent();
+        }
 
-        if (openFileDialog.ShowDialog() == true)
+        private void buttonmegnyitas_Click(object sender, RoutedEventArgs e)
         {
-            try
+            OpenFileDialog fileDialog = new OpenFileDialog();
+
+            if (fileDialog.ShowDialog() == true)
             {
+                var sorok = File.ReadAllLines(fileDialog.FileName);
                 dronok.Clear();
-                var sorok = File.ReadAllLines(openFileDialog.FileName);
 
-                foreach (var sor in sorok.Skip(1))
+                for (int i = 1; i < sorok.Length; i++)
                 {
-                    if (string.IsNullOrWhiteSpace(sor))
-                        continue;
-
-                    var adatok = sor.Split('\t');
-                    if (adatok.Length >= 6)
-                    {
-                        dronok.Add(new Dron
-                        {
-                            DroneNeve = adatok[0],
-                            Tipus = adatok[1],
-                            GyartasiEv = int.Parse(adatok[2]),
-                            MaxSebesseg = int.Parse(adatok[3]),
-                            AkkumulatorKapacitas = int.Parse(adatok[4]),
-                            RepulesiIdo = int.Parse(adatok[5])
-                        });
-                    }
+                    dronok.Add(new Dronok(sorok[i], ','));
                 }
 
-                dronokDataGrid.ItemsSource = dronok;
-                MessageBox.Show($"Sikeres betöltés: {dronok.Count} drón adata.");
+                datagridDronok.ItemsSource = dronok;
+
+                // Típusok ComboBox feltöltése
+                var tipusok = dronok.Select(d => d.Tipus).Distinct().OrderBy(t => t).ToList();
+                tipusok.Insert(0, "Összes");
+                comboTipusSzuro.ItemsSource = tipusok;
+                comboTipusSzuro.SelectedIndex = 0;
             }
-            catch (Exception ex)
+        }
+
+        private void comboTipusSzuro_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string kivalasztott = comboTipusSzuro.SelectedItem as string;
+
+            if (kivalasztott == "Összes")
             {
-                MessageBox.Show($"Hiba történt: {ex.Message}", "Hiba", 
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                datagridDronok.ItemsSource = dronok;
+            }
+            else
+            {
+                datagridDronok.ItemsSource = dronok.Where(d => d.Tipus == kivalasztott).ToList();
             }
         }
     }
-
-    private void TipusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (tipusComboBox.SelectedItem == null || !dronok.Any()) return;
-
-        var kivalasztott = tipusComboBox.SelectedItem.ToString();
-        if (kivalasztott == "Összes")
-        {
-            dronokDataGrid.ItemsSource = dronok;
-        }
-        else
-        {
-            dronokDataGrid.ItemsSource = dronok.Where(d => d.Tipus == kivalasztott);
-        }
-    }
-}`}
+}
+`}
                 </pre>
               </div>
 

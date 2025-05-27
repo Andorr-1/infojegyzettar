@@ -629,10 +629,11 @@ app.listen(PORT, () => {
                 A chinook.db adatbázis kapcsolat létrehozása:
               </p>
               <pre className="bg-gray-100 p-4 rounded">
-                {`const sqlite3 = require('sqlite3').verbose();
+                {`
+                const sqlite3 = require('sqlite3');
 const path = require('path');
 
-const db = new sqlite3.Database(path.join(__dirname, 'chinook.db'));`}
+const db = new sqlite3.Database("./adatbázis_neve.db");`}
               </pre>
 
               <h4 className="text-xl font-semibold mt-6 mb-3">4. Nodemon használata</h4>
