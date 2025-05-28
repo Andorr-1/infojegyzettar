@@ -824,18 +824,46 @@ app.put("/tasks/:id", (req, res) => {
 });
 
 // Feladat törlése
-app.delete("/tasks/:id", (req, res) => {
-  const sql = \`DELETE FROM tasks WHERE id = ?\`;
-  db.run(sql, [req.params.id], function (error) {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: "A feladat nem található." });
-    }
-    res.json({ message: "Feladat sikeresen törölve!" });
-  });
-});`}
+
+
+import { useNavigate } from "react-router-dom";
+
+const Kártyatörlés = ({ felhasználó, setRefresh }) => {
+  const navigate = useNavigate();
+  const baseUrl = import.meta.env.VITE_API_BASE;
+
+  const deletefelhasználó = async (azonosító) => {
+    const response = await fetch($"{baseUrl}/végpontnév/id/$"{azonosító}, {
+      method: DELETE
+    });
+
+    const data = await response.json();
+    setRefresh(prev => !prev);
+    alert(data.message);
+    navigate("/"); // Navigálás főoldalra
+  };
+
+  return (
+    <div className="bg-green-100 rounded-xl shadow p-4">
+      <h2 className="text-xl font-bold">{felhasználó.nev}</h2>
+      <p className="text-sm"> azonosító: {felhasználó.azonosító}</p>
+      <button
+        className="btn btn-error mt-2"
+        onClick={() => deletefelhasználó(felhasználó.azonosító)}
+      >
+        Törlés
+      </button>
+    </div>
+  );
+};
+
+export default Kártyatörlés;
+
+ehhez fontos a .env file létrehozása az src-n belül
+VITE_API_BASE=http://localhost:8000/
+
+
+`}
                 </pre>
               </div>
 
