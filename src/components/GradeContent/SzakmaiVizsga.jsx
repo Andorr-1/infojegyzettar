@@ -301,11 +301,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Példa API hívás
 const fetchStudents = async () => {
   try {
-    const response = await fetch(\`\${API_URL}/tanulok\`);
+    const response = await fetch(\`\${API_URL}/végpontnév\`);
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Hiba a tanulók lekérdezésekor:', error);
+    console.error('Hiba az adatok lekérdezésekor:', error);
     throw error;
   }
 };`}
@@ -318,48 +318,48 @@ const fetchStudents = async () => {
                   A React komponensek moduláris építőelemek, amelyek újrafelhasználhatók és könnyen karbantarthatók.
                 </p>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
-                  {`// Tanulok.jsx
+                  {`// név.jsx
 import React from 'react';
-import Student from '../assets/student.svg';
+import név from '../assets/név.svg';
 
-const Tanulok = () => {
+const név = () => {
   return (
     <div>
-      <h2>Tanulók</h2>
-      <img src={Student} alt="Student" />
+      <h2>Nevek</h2>
+      <img src={név} alt="név" />
     </div>
   );
 };
 
-export default Tanulok;
+export default név;
 
 import React from 'react';
 
-const TanuloForm = () => {
+const névform = () => {
   return (
     <div>
-      <h2>Új tanuló felvitele</h2>
+      <h2>Új Ember felvitele</h2>
     </div>
   );
 };
 
-export default TanuloForm;
+export default névform;
 
 // Menu.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Books from '../assets/books.png';
+import kép from '../assets/kép.png';
 
 const Menu = () => {
   return (
     <nav className="bg-primary p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <img src={Books} alt="Books" className="h-8" />
+        <img src={kép} alt="kép" className="h-8" />
         <div className="space-x-4">
-          <Link to="/tanulok" className="text-white hover:text-gray-200">
-            Tanulók
+          <Link to="/név" className="text-white hover:text-gray-200">
+            Nevek
           </Link>
-          <Link to="/tanuloform" className="text-white hover:text-gray-200">
+          <Link to="/névform" className="text-white hover:text-gray-200">
             Új tanuló
           </Link>
         </div>
@@ -406,32 +406,32 @@ export default App;`}
                   A komponensekben az adatokat state-ben tároljuk és API hívásokkal kezeljük.
                 </p>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
-                  {`// Tanulok.jsx
+                  {`// nevek.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Tanulok = () => {
-  const [students, setStudents] = useState([]);
+const nevek = () => {
+  const [nevek, setnevek] = useState([]);
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetchStudents();
+    fetchnevek();
   }, []);
 
-  const fetchStudents = async () => {
+  const fetchnevek = async () => {
     try {
-      const response = await fetch(\`\${API_URL}/tanulok\`);
+      const response = await fetch(\`\${API_URL}/végpontnév\`);
       const data = await response.json();
-      setStudents(data);
+      setnevek(data);
     } catch (error) {
-      console.error('Hiba a tanulók lekérdezésekor:', error);
+      console.error('Hiba a nevek lekérdezésekor:', error);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await fetch(\`\${API_URL}/tanulo/id/\${id}\`, {
+      await fetch(\`\${API_URL}/végpontnév/id/\${id}\`, {
         method: 'DELETE'
       });
       navigate('/');
@@ -443,12 +443,12 @@ const Tanulok = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {students.map(student => (
+        {név.map(név => (
           <TanuloCard
-            key={student.oktazon}
-            student={student}
+            key={név.azonosító}
+            név={név}
             onDelete={handleDelete}
-            image={Studying}
+            image={kép}
           />
         ))}
       </div>
@@ -456,18 +456,18 @@ const Tanulok = () => {
   );
 };
 
-export default Tanulok;
+export default nevek;
 
-const TanuloCard = ({ student, onDelete, image }) => {
+const névCard = ({ név, onDelete, image }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow">
-      <img src={image} alt="Studying" className="w-full h-48 object-cover rounded" />
-      <h3>{student.nev}</h3>
-      <p>Oktatási azonosító: {student.oktazon}</p>
-      <p>Hozott: {student.hozott}</p>
-      <p>Központi: {student.kpmagy + student.kpmat}</p>
+      <img src={image} alt="képneve" className="w-full h-48 object-cover rounded" />
+      <h3>{név.nev}</h3>
+      <p> azonosító: {név.azonosító}</p>
+      <p>továbbitott: {név.továbbitott}</p>
+      <p>Központi: {név.kpmagy + név.kpmat}</p>
       <button
-        onClick={() => onDelete(student.oktazon)}
+        onClick={() => onDelete(név.azonosító)}
         className="bg-red-500 text-white px-4 py-2 rounded"
       >
         Törlés
@@ -484,11 +484,11 @@ const TanuloCard = ({ student, onDelete, image }) => {
                   Az űrlapok kezeléséhez state-et használunk és a form submit eseményt kezeljük.
                 </p>
                 <pre className="bg-gray-100 p-4 rounded mb-4">
-                  {`// TanuloForm.jsx
+                  {`// nevekform.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const TanuloForm = () => {
+const nevekForm = () => {
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
   const [formData, setFormData] = useState({
@@ -509,7 +509,7 @@ const TanuloForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch(\`\${API_URL}/tanulo\`, {
+      await fetch(\`\${API_URL}/végpontnév\`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -518,18 +518,18 @@ const TanuloForm = () => {
       });
       navigate('/');
     } catch (error) {
-      console.error('Hiba a tanuló felvitele során:', error);
+      console.error('Hiba a tulajdonságok felvitele során:', error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4">
       <div className="mb-4">
-        <label className="block mb-2">Oktatási azonosító:</label>
+        <label className="block mb-2"> azonosító:</label>
         <input
           type="text"
-          name="oktazon"
-          value={formData.oktazon}
+          name="azonosító"
+          value={formData.azonosító}
           onChange={handleChange}
           className="w-full p-2 border rounded"
           required
@@ -547,33 +547,33 @@ const TanuloForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label className="block mb-2">Hozott pontszám:</label>
+        <label className="block mb-2">továbbitott pontszám:</label>
         <input
           type="number"
-          name="hozott"
-          value={formData.hozott}
+          name="továbbitott"
+          value={formData.továbbitott}
           onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />
       </div>
       <div className="mb-4">
-        <label className="block mb-2">Központi magyar:</label>
+        <label className="block mb-2">Központi tárgynév:</label>
         <input
           type="number"
-          name="kpmagy"
-          value={formData.kpmagy}
+          name="tárgynév"
+          value={formData.tárgynév}
           onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />
       </div>
       <div className="mb-4">
-        <label className="block mb-2">Központi matek:</label>
+        <label className="block mb-2">Központi tárgynév:</label>
         <input
           type="number"
-          name="kpmat"
-          value={formData.kpmat}
+          name="tárgynév"
+          value={formData.tárgynév}
           onChange={handleChange}
           className="w-full p-2 border rounded"
           required
@@ -586,7 +586,63 @@ const TanuloForm = () => {
   );
 };
 
-export default TanuloForm;`}
+export default névform;
+
+import React from 'react';
+
+const kártyaAlap = ({ alap }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">{alap.nev}</h2>
+            <p className="text-sm text-gray-500">Oktatási azonosító: {alap.azonostio}</p>
+          </div>
+          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+            {alap.hozott} pont
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span className="text-gray-600">Központi tárgynév:</span>
+            <span className="font-medium">{alap.kpmagy} pont</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Központi tárgynév:</span>
+            <span className="font-medium">{alap.kpmat} pont</span>
+          </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-500">összeg:</span>
+            <span className="font-bold text-lg">
+              {alap.hozott + alap.kpmagy + alap.kpmat} pont
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TanuloCard;
+
+háttérkép belálítása a következő képen történhet:
+<section 
+      className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-transparent to-transparent pb-12 pt-20 sm:pb-16 sm:pt-32 lg:pb-24 xl:pb-32 xl:pt-40"
+      style={{
+        backgroundImage: "url('háttered-kép-útvonala-itt.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundBlendMode: "overlay" // Opcionális, ha szeretnéd összekeverni a gradienttel
+      }}
+    >
+
+
+`}
                 </pre>
               </div>
             </div>
