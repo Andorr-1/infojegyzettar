@@ -627,11 +627,11 @@ xl: 1280px   // Extra large devices
 app.get("/rendeles/:rendeles_azonosito", (req,res) =>{
     const rendeles_azonosito = req.params.razon
     db.all(
-        SELECT rendelesek.rendeles_azonosito, rendelesek.rdatum, rendelesek.termek_azonosito, rendelesek.db, 
-                termekek.tnev as termek_nev, kategoriak.knev as kategoria_nev 
+        SELECT rendelesek.rendeles_azonosito, rendelesek.rendelésdátum, rendelesek.termek_azonosito, rendelesek.darabszám, 
+                termekek.terméknév as termek_nev, kategoriak.kategoria_nev as kategoria_nev 
          FROM rendelesek, termekek, kategoriak 
          WHERE rendelesek.termek_azonosito = termekek.termek_azonosito 
-         AND termekek.kazon = kategoriak.kazon 
+         AND termekek.katergoiraazonostio = kategoriak.katergoiraazonostio 
          AND rendelesek.rendeles_azonosito = ?,
         [rendeles_azonosito],
         (error, rows) =>{
@@ -661,10 +661,10 @@ app.get("/rendeles/:rendeles_azonosito", (req,res) =>{
 });
 app.patch("/rendeles/:rendeles_azonosito", (req,res) =>{
     const rendeles_azonosito = req.params.razon
-    const {rdatum, termek_azonosito, db} = req.body
-    const sql = 'UPDATE rendelesek SET rdatum = ?, termek_azonosito = ?, db = ? WHERE rendeles_azonosito = ?'
+    const {rendelesdatum, termek_azonosito, db} = req.body
+    const sql = 'UPDATE rendelesek SET rendelesdatum = ?, termek_azonosito = ?, db = ? WHERE rendeles_azonosito = ?'
     
-    db.run(sql, [rdatum, termek_azonosito, db, rendeles_azonosito], (error) =>{
+    db.run(sql, [rendelesdatum, termek_azonosito, db, rendeles_azonosito], (error) =>{
         if (error){
             res.json({error})
             console.log(error)
@@ -675,10 +675,10 @@ app.patch("/rendeles/:rendeles_azonosito", (req,res) =>{
 })
 
 app.post("/kategoriak", (req,res) =>{
-    const {kazon, knev} = req.body
-    const sql = (INSERT INTO kategoriak (kazon, knev) VALUES (?, ?))
+    const {kategoriakazonostio, kategoria_nev} = req.body
+    const sql = (INSERT INTO kategoriak (kategoriakazonostio, kategoria_nev) VALUES (?, ?))
 
-    db.run(sql, [kazon, knev], (error) =>{
+    db.run(sql, [kategoriakazonostio, kategoria_nev], (error) =>{
         if (error){
             res.json({error})
             console.log(error)

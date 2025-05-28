@@ -590,6 +590,8 @@ export default névform;
 
 import React from 'react';
 
+véletlenszerű adatokkal
+alap kártya séma:
 const kártyaAlap = ({ alap }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -628,7 +630,7 @@ const kártyaAlap = ({ alap }) => {
   );
 };
 
-export default TanuloCard;
+export default kártyaAlap;
 
 háttérkép belálítása a következő képen történhet:
 <section 
