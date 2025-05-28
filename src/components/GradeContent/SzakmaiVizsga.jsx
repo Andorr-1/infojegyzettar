@@ -368,7 +368,39 @@ const Menu = () => {
   );
 };
 
-export default Menu;`}
+export default Menu;
+
+
+alap Landing page
+
+import React from "react";
+import kep from "./assets/képnév.png"; // A kép elérési útja
+
+const landingPage = () => {
+  return (
+    <div className="flex flex-col md:flex-row items-center justify-center gap-40 px-4 py-40">
+      {/* Bal oldali szöveg /}
+      <div className="text-center md:text-left md:max-w-md space-y-2">
+        <h1 className="text-3xl md:text-4xl font-semibold">
+          Felhasználó <span className="text-green-600"></span>
+        </h1>
+        <p className="text-gray-600 text-sm md:text-base">
+          Felhasználói adatok a{" "}
+          <span className="text-green-700"></span> tanévre
+        </p>
+      </div>
+
+      {/ Jobb oldali kép */}
+      <div>
+        <img src={kep} alt="képnév" className="w-56 md:w-72" />
+      </div>
+    </div>
+  );
+};
+
+export default landingPage;
+
+`}
                 </pre>
               </div>
 
