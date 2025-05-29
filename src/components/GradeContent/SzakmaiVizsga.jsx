@@ -958,7 +958,27 @@ SELECT *
 FROM jaratok
 WHERE jaratSzam LIKE '%1%'
 AND jaratTipus = 'T'
-AND elsoAjtos = 1;`}
+AND elsoAjtos = 1;
+
+-- 1. Rendelés frissítése
+UPDATE megrendelesek 
+SET termek_kod = ?, datum = ?, mennyiseg = ?
+WHERE megrendeles_id = ?;
+
+-- 2. Új kategória létrehozása 
+INSERT INTO csoportok (csoport_kod, csoport_nev) VALUES (?, ?);
+
+-- 3. Rendelés részletei termék és kategória adatokkal
+SELECT 
+    m.megrendeles_id, m.datum, m.mennyiseg,
+    t.termek_kod, t.termek_nev, t.feszultseg, t.teljesitmeny, t.illesztes, t.elettartam, t.ar,
+    c.csoport_kod AS kategoria_id, c.csoport_nev AS kategoria_nev
+FROM megrendelesek m
+JOIN termekek t ON m.termek_kod = t.termek_kod
+JOIN csoportok c ON t.csoport_kod = c.csoport_kod
+WHERE m.megrendeles_id = ?;
+
+`}
               </pre>
             </div>
           </section>
