@@ -4,7 +4,7 @@ const Sidebar = ({ menuItems, selectedItem, onSelectItem }) => {
   return (
     <div className="w-72 bg-primary text-white p-5 shadow-lg">
       <div className="py-5 border-b border-white/10 mb-5">
-        <h1 className="text-2xl font-bold">info.fejlessz.hu</h1>
+        <h1 className="text-2xl font-bold">infojegyzettar</h1>
       </div>
       <nav>
         <ul className="space-y-2.5">

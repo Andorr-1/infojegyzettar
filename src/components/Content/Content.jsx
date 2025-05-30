@@ -55,9 +55,11 @@ const Content = ({ selectedItem }) => {
           <h2 className="text-4xl font-bold text-primary mb-6">
             Üdvözöljük az Infojegyzettár oldalon!
           </h2>
-          <p className="text-xl text-gray-600">
-            Válasszon a bal oldali menüből a kívánt tananyagot.
-          </p>
+          <h1 className="text-xl text-gray-600">
+            Az oldal átformálása és további feladatok tananyagok feltöltése történik.
+            <br />
+            Az oldal jelenleg nem érhető el.
+          </h1>
         </div>
       )}
     </div>
