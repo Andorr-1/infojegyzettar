@@ -1,11 +1,7 @@
 import React from 'react';
-import Grade9 from '../GradeContent/Grade9';
-import Grade10 from '../GradeContent/Grade10';
-import Grade11 from '../GradeContent/Grade11';
-import Grade12 from '../GradeContent/Grade12';
-import Grade13 from '../GradeContent/Grade13';
-import AgazatiVizsga from '../GradeContent/AgazatiVizsga';
-import SzakmaiVizsga from '../GradeContent/SzakmaiVizsga';
+import Grade9 from '../Grade9';
+import Grade10 from '../Grade10';
+import AgazatiVizsga from '../ágazati vizsga';
 
 const Content = ({ selectedItem }) => {
   const contentMap = {
@@ -17,49 +13,38 @@ const Content = ({ selectedItem }) => {
       title: '10. osztály programozás',
       content: <Grade10 />
     },
-    '11. osztály programozás': {
-      title: '11. osztály programozás',
-      content: <Grade11 />
-    },
-    '12. osztály programozás': {
-      title: '12. osztály programozás',
-      content: <Grade12 />
-    },
-    '13. osztály programozás': {
-      title: '13. osztály programozás',
-      content: <Grade13 />
-    },
     'Ágazati vizsga felkészítő tananyag': {
       title: 'Ágazati vizsga felkészítő tananyag',
       content: <AgazatiVizsga />
-    },
-    'Szakmai vizsga tananyag': {
-      title: 'Szakmai vizsga tananyag',
-      content: <SzakmaiVizsga />
     }
   };
 
   return (
-    <div className="flex-1 p-10 bg-gray-50">
+    <div className="flex-1 p-4 md:p-8 bg-gray-50 min-h-screen">
       {selectedItem ? (
-        <div className="bg-white rounded-lg shadow-md p-8 animate-fadeIn">
-          <h2 className="text-3xl font-bold text-primary mb-6 pb-4 border-b-2 border-secondary">
+        <div className="bg-white rounded-lg shadow-lg p-4 md:p-8 animate-fadeIn">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 pb-4 border-b-2 border-gray-200">
             {contentMap[selectedItem].title}
           </h2>
-          <div className="text-accent text-lg leading-relaxed">
+          <div className="text-gray-700">
             {contentMap[selectedItem].content}
           </div>
         </div>
       ) : (
         <div className="text-center py-16">
-          <h2 className="text-4xl font-bold text-primary mb-6">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">
             Üdvözöljük az Infojegyzettár oldalon!
           </h2>
-          <h1 className="text-xl text-gray-600">
-            Az oldal átformálása és további feladatok tananyagok feltöltése történik.
-            <br />
-            Az oldal jelenleg nem érhető el.
-          </h1>
+          <div className="max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 mb-4">
+              Válassz a bal oldali menüből a tananyagok közül:
+            </p>
+            <ul className="text-lg text-gray-600 space-y-2">
+              <li>• 9. osztály programozás</li>
+              <li>• 10. osztály programozás</li>
+              <li>• Ágazati vizsga felkészítő tananyag</li>
+            </ul>
+          </div>
         </div>
       )}
     </div>
